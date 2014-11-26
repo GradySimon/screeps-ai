@@ -1,7 +1,8 @@
 var _ = require('lodash');
 
-/* In a given room, returns the shortest distance between the from and to positions.
- * opts is an optional object that will be passed to Room.findPath, which finds the shortest path.*/
+/* In a given room, returns the length of the shortest path between the from and 
+ * to positions. opts is an optional param object that will be passed to Room.findPath,
+ * which finds the shortest path. */
 function distance(room, from, to, opts) {
     var path = room.findPath(from, to, opts);
     return path.length;
