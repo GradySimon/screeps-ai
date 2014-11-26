@@ -59,7 +59,7 @@ var bodyPartCosts = new Map([
 function computeCreepCost(creepSpec) {
     return _.reduce(creepSpec, function(sum, bodyPart) {
         return sum + bodyPartCosts.get(bodyPart);
-    });
+    }, 0);
 }
 
 /* Returns a task that orders the given spawn to create a creep according to the given creepSpec */
