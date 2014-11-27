@@ -32,12 +32,13 @@ function nearestTarget(creep, targetType) {
  * harvest energy from the nearest source and return it to the nearest spawn. */
 function workerHarvestBehavior(creep) {
     if (creep.energy < creep.energyCapacity) {
-        var nearestSource = nearestTarget(creep, Game.SOURCE);
+        var nearestSource = nearestTarget(creep, Game.SOURCES);
+        creep.moveTo(nearestSource);
         creep.harvest(nearestSource);
     } else {
         var nearestSpawn = nearestTarget(creep, Game.MY_SPAWNS);
-        creep.moveTo(spawn);
-        creep.transferEnergy(spawn);
+        creep.moveTo(nearestSpawn);
+        creep.transferEnergy(nearestSpawn);
     }
 }
 
