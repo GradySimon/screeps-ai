@@ -1,3 +1,5 @@
+var utils = require('utils');
+
 /*
  * Terminology:
  * - "behavior": a function that takes only an actor (a creep, spawn, or something else 
@@ -13,11 +15,11 @@
  * harvest energy from the nearest source and return it to the nearest spawn. */
 module.exports.workerHarvestNearestBehavior = function(creep) {
     if (creep.energy < creep.energyCapacity) {
-        var nearestSource = nearestTarget(creep, Game.SOURCES);
+        var nearestSource = utils.nearestTarget(creep, Game.SOURCES);
         creep.moveTo(nearestSource);
         creep.harvest(nearestSource);
     } else {
-        var nearestSpawn = nearestTarget(creep, Game.MY_SPAWNS);
+        var nearestSpawn = utils.nearestTarget(creep, Game.MY_SPAWNS);
         creep.moveTo(nearestSpawn);
         creep.transferEnergy(nearestSpawn);
     }
@@ -41,7 +43,7 @@ module.exports.workerHarvestBehaviorGen = function(source) {
 /* Returns a behavior that orders the given spawn to create a creep according to the given creepSpec */
 module.exports.spawnCreateCreepBehaviorGen = function(creepSpec) {
     return function(spawn) {
-        var cost = computeCreepCost(creepSpec);
+        var cost = utils.computeCreepCost(creepSpec);
         if (spawn.energy >= cost) {
             spawn.createCreep(creepSpec);
         }
