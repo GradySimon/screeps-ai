@@ -1,8 +1,8 @@
 var _ = require('lodash');
 var utils = require('utils');
 
-
 var MAX_HARVESTERS_PER_SOURCE = 4;
+
 
 function ResourceSpec(creeps, sources, spawns, energy) {
     this.creeps = creeps;
@@ -10,24 +10,24 @@ function ResourceSpec(creeps, sources, spawns, energy) {
     this.sources = sources;
     this.spawns = spawns;
     this.energy = energy;
-}
+};
 
 function Plan(resourceSpec, policy) {
     this.resourceSpec = resourceSpec;
     this.policy = policy;
-}
+};
 
 // ---- The Growth Objective ----
 
-function GrowthObjective(room) {
+module.exports.GrowthObjective = function(room) {
     this.room = room;
     this.harvesterSelector = {
         rooms: [room],
         creepSpecs: [utils.creepSpecs.Harvester]
     };
-}
+};
 
-GrowthObjective.prototype.generatePlan = function() {
+module.exports.GrowthObjective.prototype.generatePlan = function() {
     var harvesters = utils.selectCreeps(this.harvesterSelector);
     var sources = room.find(Game.SOURCES);
     var sourceToCreepAssignments = new Map(_.forEach(source, function(source) { 
@@ -57,6 +57,7 @@ GrowthObjective.prototype.generatePlan = function() {
                            - creepsRequested;
     var spawnsRequested = [];
     if (harvesterDeficit > 0) {
+        // TODO: request more spawns if harvesterDeficit > 1;
         spawnsRequested = [room.find(Game.MY_SPAWNS)[0]];
     }
     var resourceSpec = new ResourceSpec(creepsRequested, sourcesRequested, spawnsRequested);
@@ -71,6 +72,3 @@ GrowthObjective.prototype.generatePlan = function() {
     };
     return new Plan(resourceSpec, policy);
 };
-
-
-
