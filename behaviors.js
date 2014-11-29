@@ -11,7 +11,7 @@
 
 /* A function that will order the specified creep to continuously
  * harvest energy from the nearest source and return it to the nearest spawn. */
-function workerHarvestNearestBehavior(creep) {
+module.exports.workerHarvestNearestBehavior = function(creep) {
     if (creep.energy < creep.energyCapacity) {
         var nearestSource = nearestTarget(creep, Game.SOURCES);
         creep.moveTo(nearestSource);
@@ -21,11 +21,11 @@ function workerHarvestNearestBehavior(creep) {
         creep.moveTo(nearestSpawn);
         creep.transferEnergy(nearestSpawn);
     }
-}
+};
 
 /* Returns a behavior that orders the given creep to harvest from the specified source
  * and bring the gathered energy to the nearest spawn. */
-function workerHarvestBehaviorGen(source) {
+module.exports.workerHarvestBehaviorGen = function(source) {
     return function(creep) {
         if (creep.energy < creep.energyCapacity) {
             creep.moveTo(source);
@@ -35,15 +35,15 @@ function workerHarvestBehaviorGen(source) {
             creep.moveTo(nearestSpawn);
             creep.transferEnergy(nearestSpawn);
         }
-    }
-}
+    };
+};
 
 /* Returns a behavior that orders the given spawn to create a creep according to the given creepSpec */
-function spawnCreateCreepBehaviorGen(creepSpec) {
+module.exports.spawnCreateCreepBehaviorGen = function(creepSpec) {
     return function(spawn) {
         var cost = computeCreepCost(creepSpec);
         if (spawn.energy >= cost) {
             spawn.createCreep(creepSpec);
         }
     };
-} 
+};
