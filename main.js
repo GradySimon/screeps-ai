@@ -1,11 +1,19 @@
 var _ = require('lodash');
 var utils = require('utils');
+var objectives = require('objectives');
+var resources = require('resources')
 
+var myRooms = utils.allMyRooms();
 
-var creeps = Game.creeps;
-var spawns = Game.spawns;
+var objectives = _.flatten([
+    _(myRooms).map(function(room) { return new GrowthObjective(room); }),
+]);
 
-var spawnCreateHarvesterBehavior = spawnCreateCreepBehaviorGen(utils.creepSpecs.Harvester);
+var plans = _(objectives).map(function(objective) { return objective.generatePlan() });
 
-_.forEach(creeps, workerHarvestBehavior);
-_.forEach(spawns, spawnCreateHarvesterBehavior);
+var evaluatedPlans = resources.evaluate(plans);
+
+var acceptedPlans = evaluatedPlans['accepted'];
+var rejectedPlans = evaluatedPlans['rejected'];
+
+_.forEach(acceptedPlans, function(plan) { plan.policy(); };
