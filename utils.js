@@ -58,7 +58,7 @@ module.exports.selectCreeps = function(selectionSpec) {
 module.exports.distance = function(room, from, to, opts) {
     var path = room.findPath(from, to, opts);
     return path.length;
-}
+};
 
 /* returns the nearest target of type targetType to the specified creep. */
 module.exports.nearestTarget = function(creep, targetType) {

@@ -10,12 +10,12 @@ function ResourceSpec(creeps, sources, spawns, energy) {
     this.sources = sources;
     this.spawns = spawns;
     this.energy = energy;
-};
+}
 
 function Plan(resourceSpec, policy) {
     this.resourceSpec = resourceSpec;
     this.policy = policy;
-};
+}
 
 // ---- The Growth Objective ----
 
