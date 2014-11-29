@@ -1,6 +1,20 @@
 var _ = require('lodash');
 
-var creepSpecs = {
+
+var allMyRooms = module.exports.allMyRooms = function() {
+    return _.union(creepRooms(), spawnRooms());
+};
+
+var creepRooms = module.exports.creepRooms = function() {
+    return _(Game.creeps).map('room').uniq();
+};
+
+var spawnRooms = module.exports.spawnRooms = function() {
+    return _(Game.spawns).map('room').uniq();
+};
+
+
+module.exports.creepSpecs = {
     Harvester: [Game.MOVE, Game.WORK, Game.MOVE, Game.WORK, Game.CARRY]
 };
 
@@ -15,48 +29,48 @@ var bodyPartCosts = new Map([
     ]);
 
 /* Computes the energy cost of the creep specification specified by creepSpec */    
-function computeCreepCost(creepSpec) {
+module.exports.computeCreepCost = function(creepSpec) {
     return _.reduce(creepSpec, function(sum, bodyPart) {
         return sum + bodyPartCosts.get(bodyPart);
     }, 0);
-}
+};
 
-function SelectionSpec(rooms, creepSpecs) {
+module.exports.SelectionSpec = function(rooms, creepSpecs) {
     this.rooms = rooms;
     this.creepSpecs = creepSpecs;
-}
+};
 
-function selectCreeps(selectionSpec) {
+module.exports.selectCreeps = function(selectionSpec) {
     return _.filter(Game.creeps, function (creep) {
         if (selectionSpec.rooms)
-            if (!_.contains(selectionSpec.rooms, creep.room)
+            if (!_.contains(selectionSpec.rooms, creep.room))
                 return false;
         if (selectionSpec.creepSpec)
             if (!_.contains(selectionSpec.creepSpecs, creep.spec))
                 return false; 
         return true;
-    };
-} 
+    });
+};
 
 /* In a given room, returns the length of the shortest path between the from and 
  * to positions. opts is an optional param object that will be passed to Room.findPath,
  * which finds the shortest path. */
-function distance(room, from, to, opts) {
+module.exports.distance = function(room, from, to, opts) {
     var path = room.findPath(from, to, opts);
     return path.length;
 }
 
 /* returns the nearest target of type targetType to the specified creep. */
-function nearestTarget(creep, targetType) {
+module.exports.nearestTarget = function(creep, targetType) {
     var room = creep.room;
     var targets = room.find(targetType);
     return _.min(targets, function(target) {
         return distance(room, creep.pos, target.pos);
     });
-}
+};
 
-function sortByDistanceFrom(source, targets) {
+module.exports.sortByDistanceFrom = function(source, targets) {
     return _.sortBy(targets, function(target) {
         return distance(room, source.pos, target.pos);
-    })
-}
+    });
+};
