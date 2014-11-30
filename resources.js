@@ -1,3 +1,5 @@
+/* global Game, require, module */
+
 var _ = require('lodash');
 
 module.exports.evaluate = function(plans) {

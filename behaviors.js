@@ -1,3 +1,5 @@
+/* global Game, require, module */
+
 var utils = require('utils');
 
 /*

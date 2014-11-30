@@ -1,3 +1,5 @@
+/* global Game, require, module */
+
 var _ = require('lodash');
 
 
@@ -7,7 +9,7 @@ var keyArray = module.exports.keyArray = function(map) {
         keys.push(key);
     }
     return keys;
-}
+};
 
 var allMyRooms = module.exports.allMyRooms = function() {
     return _.union(creepRooms(), spawnRooms());
@@ -51,12 +53,16 @@ module.exports.SelectionSpec = function(rooms, creepSpecs) {
 
 module.exports.selectCreeps = function(selectionSpec) {
     return _.filter(Game.creeps, function (creep) {
-        if (selectionSpec.rooms)
-            if (!_.contains(selectionSpec.rooms, creep.room))
+        if (selectionSpec.rooms) {
+            if (!_.contains(selectionSpec.rooms, creep.room)) {
                 return false;
-        if (selectionSpec.creepSpec)
-            if (!_.contains(selectionSpec.creepSpecs, creep.spec))
+            }
+        }
+        if (selectionSpec.creepSpec) {
+            if (!_.contains(selectionSpec.creepSpecs, creep.spec)) {
                 return false; 
+            }
+        }
         return true;
     });
 };
