@@ -11,10 +11,14 @@ var utils = require('utils');
  * 
  * - "behavior generator": a function that takes some parameters and returns a behavior. 
  *                         Behavior generator functions end with "BehaviorGen".
+ */
 
 
-/* A function that will order the specified creep to continuously
- * harvest energy from the nearest source and return it to the nearest spawn. */
+/**
+ * A function that will order the specified creep to continuously
+ * harvest energy from the nearest source and return it to the nearest spawn.
+ * @param  {Creep} creep The creep to apply the behavior to
+ */
 module.exports.workerHarvestNearestBehavior = function(creep) {
     if (creep.energy < creep.energyCapacity) {
         var nearestSource = utils.nearestTarget(creep, Game.SOURCES);
@@ -27,8 +31,12 @@ module.exports.workerHarvestNearestBehavior = function(creep) {
     }
 };
 
-/* Returns a behavior that orders the given creep to harvest from the specified source
- * and bring the gathered energy to the nearest spawn. */
+/**
+ * Returns a behavior that orders the given creep to harvest from the specified source
+ * and bring the gathered energy to the nearest spawn. 
+ * @param  {Source} source The source to harvest from.
+ * @return {Function} The behavior
+ */
 module.exports.workerHarvestBehaviorGen = function(source) {
     return function(creep) {
         if (creep.energy < creep.energyCapacity) {
@@ -42,7 +50,11 @@ module.exports.workerHarvestBehaviorGen = function(source) {
     };
 };
 
-/* Returns a behavior that orders the given spawn to create a creep according to the given creepSpec */
+/**
+ * Returns a behavior that orders the given spawn to create a creep according to the given creepSpec.
+ * @param  {Array of body parts} creepSpec
+ * @return {Function} The behavior
+ */
 module.exports.spawnCreateCreepBehaviorGen = function(creepSpec) {
     return function(spawn) {
         var cost = utils.computeCreepCost(creepSpec);

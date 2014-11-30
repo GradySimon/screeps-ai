@@ -1,4 +1,4 @@
-/* global Game, require, module */
+/* global require, module */
 
 var _ = require('lodash');
 

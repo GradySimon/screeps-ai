@@ -39,7 +39,11 @@ var bodyPartCosts = new Map([
         [Game.TOUGH, 5]
     ]);
 
-/* Computes the energy cost of the creep specification specified by creepSpec */    
+/**
+ * Computes the energy cost of the creep specification specified by creepSpec.
+ * @param  {[type]} creepSpec
+ * @return {[type]}
+ */
 module.exports.computeCreepCost = function(creepSpec) {
     return _.reduce(creepSpec, function(sum, bodyPart) {
         return sum + bodyPartCosts.get(bodyPart);
@@ -67,15 +71,27 @@ module.exports.selectCreeps = function(selectionSpec) {
     });
 };
 
-/* In a given room, returns the length of the shortest path between the from and 
+/**
+ * In a given room, returns the length of the shortest path between the from and 
  * to positions. opts is an optional param object that will be passed to Room.findPath,
- * which finds the shortest path. */
+ * which finds the shortest path.
+ * @param  {[type]} room
+ * @param  {[type]} from
+ * @param  {[type]} to
+ * @param  {[type]} opts
+ * @return {[type]}
+ */
 var distance = module.exports.distance = function(room, from, to, opts) {
     var path = room.findPath(from, to, opts);
     return path.length;
 };
 
-/* returns the nearest target of type targetType to the specified creep. */
+/**
+ * Returns the nearest target of type targetType to the specified creep.
+ * @param  {[type]} creep
+ * @param  {[type]} targetType
+ * @return {[type]}
+ */
 module.exports.nearestTarget = function(creep, targetType) {
     var room = creep.room;
     var targets = room.find(targetType);
