@@ -40,21 +40,22 @@ module.exports.GrowthObjective.prototype.generatePlan = function() {
             var currentAssignments = sourceToCreepAssignments.get(source);
             if (currentAssignments.length < MAX_HARVESTERS_PER_SOURCE) {
                 currentAssignments.push(harvester);
+                sourceToCreepAssignments.set(source, currentAssignments);
                 return false;
             }
         });
     });
     var creepToSourceAssignments = new Map();
-    _.forEach(sourceToCreepAssignments, function(kvPair) {
-        var source = kvPair[0];
-        var harvesters = kvPain[1];
-        _.forEach(harvesters, function (harvester) {
+    for (var assignment of sourceToCreepAssignments.entries()) {
+        var source = assignment[0];
+        var assignedHarvesters = assignment[1];
+        _.forEach(assignedHarvesters, function (harvester) {
             creepToSourceAssignments.set(harvester, source);
         });
-    });
+    }
     var numCreepsRequested = creepToSourceAssignments.size;
-    var creepsRequested = creepToSourceAssignments.keys();
-    var sourcesRequested = sourceToCreepAssignments.keys();
+    var creepsRequested = utils.keyArray(creepToSourceAssignments);
+    var sourcesRequested = utils.keyArray(sourceToCreepAssignments);
     var harvesterDeficit = sources.length * MAX_HARVESTERS_PER_SOURCE
                            - numCreepsRequested;
     var spawnsRequested = [];
@@ -65,7 +66,7 @@ module.exports.GrowthObjective.prototype.generatePlan = function() {
     var resourceSpec = new ResourceSpec(creepsRequested, sourcesRequested, spawnsRequested);
     var policy = function() {
         _.forEach(creepsRequested, function(creep) {
-            assignedSource = creepToSourceAssignments.get(creep);
+            var assignedSource = creepToSourceAssignments.get(creep);
             behaviors.workerHarvestBehaviorGen(assignedSource)(creep);
         });
         _.forEach(spawnsRequested, function(spawn) {

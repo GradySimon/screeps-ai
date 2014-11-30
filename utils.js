@@ -1,6 +1,14 @@
 var _ = require('lodash');
 
 
+var keyArray = module.exports.keyArray = function(map) {
+    var keys = [];
+    for (var key of map.keys()) {
+        keys.push(key);
+    }
+    return keys;
+}
+
 var allMyRooms = module.exports.allMyRooms = function() {
     return _.union(creepRooms(), spawnRooms());
 };
