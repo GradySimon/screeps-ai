@@ -3,14 +3,14 @@
 var utils = require('utils');
 
 /*
- * Terminology:
- * - "behavior": a function that takes only an actor (a creep, spawn, or something else 
- *               that can "do stuff") and when applied to that actor each tick, will
- *               direct that actor to do something continuously. Behavior function names
- *               end with "Behavior".
+ * Terminology: 
+ * *behavior*: a function that takes only an actor (a creep,
+ * spawn, or something else that can "do stuff") and when applied to that actor
+ * each tick, will direct that actor to do something continuously. Behavior
+ * function names end with "Behavior".
  * 
- * - "behavior generator": a function that takes some parameters and returns a behavior. 
- *                         Behavior generator functions end with "BehaviorGen".
+ * *behavior generator*: a function that takes some parameters and returns a
+ * behavior. Behavior generator functions end with "BehaviorGen".
  */
 
 
