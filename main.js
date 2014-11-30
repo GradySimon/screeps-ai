@@ -6,16 +6,24 @@ var resources = require('resources');
 
 var myRooms = utils.allMyRooms();
 
-var objectiveList = _.flatten([
-    _.map(myRooms, function(room) { return new objectives.GrowthObjective(room); }),
-]);
+// TODO: Refactor so that cross-room plans can work.
+_.forEach(myRooms, function(room) {
+    var resourceManager = new resources.ResourceManager(resources.allResourceInRoom());
 
-var plans = _.map(objectiveList, function(objective) { return objective.generatePlan(); });
+    var activeObjectives = [
+        new objectives.GrowthObjective(room)
+    ];
+    var acceptedPlans = [];
 
-//TODO: Loop on this to give objectives whose plan was rejected a chance to reformulate.
-var evaluatedPlans = resources.arbitrate(plans);
+    do {
+        var candidatePlans = _.map(activeObjectives, function(objective) {
+            return objective.generatePlan(100); // TODO: real importance value
+        });
+        var arbitrationResults = resourceManager.arbitrate(candidatePlans);
+        acceptedPlans = _.union(acceptedPlans, arbitrationResults.accepted);
+        resourceManager.commit(arbitrationResults.accepted);
+        activeObjectives = _.map(arbitrationResults.rejected, 'objective');
+    } while(activeObjectives.length > 0);
 
-var acceptedPlans = evaluatedPlans.accepted;
-var rejectedPlans = evaluatedPlans.rejected;
-
-_.forEach(acceptedPlans, function(plan) { plan.policy(); });
+    _.forEach(acceptedPlans, function(acceptedPlan) { acceptedPlan.policy(); });
+});

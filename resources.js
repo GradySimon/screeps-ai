@@ -25,7 +25,8 @@ module.exports.ResourceBundle = function(creeps, sources, spawns, energy) {
  * @param {ResourceBundle} resourceBundle
  */
 var ResourceManager = module.exports.ResourceManager = function(resourceBundle) {
-    this.availableResources = resourceBundle;
+    this.managedResources = resourceBundle;
+    this.availableResources = _.clone(resourceBundle);
 };
 
 /**
@@ -34,18 +35,33 @@ var ResourceManager = module.exports.ResourceManager = function(resourceBundle) 
  * @param  {Collection of Plans} plans
  * @return {Object}
  */
-ResourceManager.prototype.arbitrate = function(plans) {
-    var candidatePlanSets = _.sortBy(utils.allSubsets(plans), computePlanSetImportance);
-    var bestAcceptedPlanSet = _.find(candidatePlanSets, this.canSatisfyPlanSet);
-    var rejectedPlans = _.difference(plans, bestAcceptedPlanSet);
+ResourceManager.prototype.arbitrate = function(planSet) {
+    var candidatePlanSets = _.sortBy(utils.allSubsets(planSet), computePlanSetImportance);
+    var bestSatisfiablePlanSet = _.find(candidatePlanSets, this.canSatisfyPlanSet);
+    var rejectedPlans = _.difference(planSet, bestSatisfiablePlanSet);
     return {
-        accepted: bestAcceptedPlanSet,
+        accepted: bestSatisfiablePlanSet,
         rejected: rejectedPlans
     };
 };
 
 // TODO: Write a method to "accept" a planSet, which would mark its resources
 // unavailable for future arbitration rounds.
+
+/**
+ * Commits a planSet. Removes the resources required by the planSet from set of available resources.
+ * @param  {Collection of Plans} planSet
+ */
+ResourceManager.prototype.commit = function(planSet) {
+    this.availableResources.creeps = _.difference(this.availableResources.creeps,
+                                                  requestedCreeps(planSet));
+    this.availableResources.sources = _.difference(this.availableResources.sources,
+                                                   requestedSources(planSet));
+    this.availableResources.spawns = _.difference(this.availableResources.spawns,
+                                                  requestedSpawns(planSet));
+    this.availableResources.energy = this.availableResources.energy -
+                                     requestedEnergy(planSet);
+};
 
 /**
  * Returns whether this ResourceManager can provide all the resources requested

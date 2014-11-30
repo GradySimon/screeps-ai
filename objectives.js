@@ -8,7 +8,9 @@ var resources = require('resources');
 var MAX_HARVESTERS_PER_SOURCE = 4;
 
 
-function Plan(resourceBundle, policy) {
+function Plan(objective, importance, resourceBundle, policy) {
+    this.objective = objective;
+    this.importance = importance;
     this.resourceBundle = resourceBundle;
     this.policy = policy;
 }
@@ -36,7 +38,7 @@ var GrowthObjective = module.exports.GrowthObjective = function(room) {
  * sources and will create new creeps if necessary to harvest best.
  * @return {Plan}
  */
-GrowthObjective.prototype.generatePlan = function() {
+GrowthObjective.prototype.generatePlan = function(importance) {
     var harvesters = utils.selectCreeps(this.harvesterSelector);
     var sources = this.room.find(Game.SOURCES);
     var assignments = this.getAssignments(harvesters, sources);
@@ -53,7 +55,7 @@ GrowthObjective.prototype.generatePlan = function() {
             behaviors.spawnCreateCreepBehaviorGen(utils.creepSpecs.Harvester)(spawn);
         });
     };
-    return new Plan(resourceSpec, policy);
+    return new Plan(this, importance, resourceSpec, policy);
 };
 
 /**
