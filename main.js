@@ -12,6 +12,7 @@ var objectiveList = _.flatten([
 
 var plans = _.map(objectiveList, function(objective) { return objective.generatePlan(); });
 
+//TODO: Loop on this to give objectives whose plan was rejected a chance to reformulate.
 var evaluatedPlans = resources.arbitrate(plans);
 
 var acceptedPlans = evaluatedPlans.accepted;
