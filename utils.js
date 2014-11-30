@@ -11,6 +11,25 @@ var keyArray = module.exports.keyArray = function(map) {
     return keys;
 };
 
+/**
+ * Given an array, returns an array of all unique subsets of the elements in that array.
+ * @param  {Array} array
+ * @return {Array} An Array of Arrays
+ */
+module.exports.allSubsets = function(array){
+    var result, mask, total = Math.pow(2, array.length);
+    for(mask = 0; mask < total; mask++){ //O(2^n)
+        result = [];
+        var i = array.length - 1; //O(n)
+        do{
+            if((mask & (1 << i)) !== 0){
+                result.push(array[i]);
+            }
+        }while(i--);
+        console.log(result);
+    }
+};
+
 var allMyRooms = module.exports.allMyRooms = function() {
     return _.union(creepRooms(), spawnRooms());
 };
