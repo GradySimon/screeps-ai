@@ -6,12 +6,13 @@ var allMyRooms = module.exports.allMyRooms = function() {
 };
 
 var creepRooms = module.exports.creepRooms = function() {
-    return _(Game.creeps).map('room').uniq();
+    return _(Game.creeps).map('room').uniq().valueOf();
 };
 
 var spawnRooms = module.exports.spawnRooms = function() {
-    return _(Game.spawns).map('room').uniq();
+    return _(Game.spawns).map('room').uniq().valueOf();
 };
+
 
 
 module.exports.creepSpecs = {
@@ -55,7 +56,7 @@ module.exports.selectCreeps = function(selectionSpec) {
 /* In a given room, returns the length of the shortest path between the from and 
  * to positions. opts is an optional param object that will be passed to Room.findPath,
  * which finds the shortest path. */
-module.exports.distance = function(room, from, to, opts) {
+var distance = module.exports.distance = function(room, from, to, opts) {
     var path = room.findPath(from, to, opts);
     return path.length;
 };
@@ -71,6 +72,6 @@ module.exports.nearestTarget = function(creep, targetType) {
 
 module.exports.sortByDistanceFrom = function(source, targets) {
     return _.sortBy(targets, function(target) {
-        return distance(room, source.pos, target.pos);
+        return distance(source.room, source.pos, target.pos);
     });
 };

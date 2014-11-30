@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var utils = require('utils');
+var behaviors = require('behaviors');
 
 var MAX_HARVESTERS_PER_SOURCE = 4;
 
@@ -29,13 +30,13 @@ module.exports.GrowthObjective = function(room) {
 
 module.exports.GrowthObjective.prototype.generatePlan = function() {
     var harvesters = utils.selectCreeps(this.harvesterSelector);
-    var sources = room.find(Game.SOURCES);
-    var sourceToCreepAssignments = new Map(_.forEach(source, function(source) { 
+    var sources = this.room.find(Game.SOURCES);
+    var sourceToCreepAssignments = new Map(_.map(sources, function(source) { 
         return [source, []]; 
     }));
     _.forEach(harvesters, function(harvester) {
         var sortedSources = utils.sortByDistanceFrom(harvester, sources);
-        _.forEach(sortedSources, function() {
+        _.forEach(sortedSources, function(source) {
             var currentAssignments = sourceToCreepAssignments.get(source);
             if (currentAssignments.length < MAX_HARVESTERS_PER_SOURCE) {
                 currentAssignments.push(harvester);
@@ -51,14 +52,15 @@ module.exports.GrowthObjective.prototype.generatePlan = function() {
             creepToSourceAssignments.set(harvester, source);
         });
     });
+    var numCreepsRequested = creepToSourceAssignments.size;
     var creepsRequested = creepToSourceAssignments.keys();
     var sourcesRequested = sourceToCreepAssignments.keys();
-    var harvesterDeficit = sourcesRequested * MAX_HARVESTERS_PER_SOURCE
-                           - creepsRequested;
+    var harvesterDeficit = sources.length * MAX_HARVESTERS_PER_SOURCE
+                           - numCreepsRequested;
     var spawnsRequested = [];
     if (harvesterDeficit > 0) {
         // TODO: request more spawns if harvesterDeficit > 1;
-        spawnsRequested = [room.find(Game.MY_SPAWNS)[0]];
+        spawnsRequested = [this.room.find(Game.MY_SPAWNS)[0]];
     }
     var resourceSpec = new ResourceSpec(creepsRequested, sourcesRequested, spawnsRequested);
     var policy = function() {
