@@ -29,9 +29,9 @@ var ResourceManager = module.exports.ResourceManager = function(resourceBundle) 
 };
 
 /**
- * Arbitrates among the given plans. Returns an object specifying which plans
+ * Arbitrates among the given plans. Returns an object specifying which Plans
  * were accepted and which were rejected.
- * @param  {Collection of plans} plans
+ * @param  {Collection of Plans} plans
  * @return {Object}
  */
 ResourceManager.prototype.arbitrate = function(plans) {
@@ -50,7 +50,7 @@ ResourceManager.prototype.arbitrate = function(plans) {
 /**
  * Returns whether this ResourceManager can provide all the resources requested
  * by the planSet.
- * @param  {Collection of plans} planSet
+ * @param  {Collection of Plans} planSet
  * @return {Boolean}
  */
 ResourceManager.prototype.canSatisfyPlanSet = function(planSet) {
@@ -63,7 +63,7 @@ ResourceManager.prototype.canSatisfyPlanSet = function(planSet) {
 /**
  * Returns true iff this ResourceManager can provide all the creeps requested by
  * the planSet.
- * @param  {Collection of plans} planSet
+ * @param  {Collection of Plans} planSet
  * @return {Boolean}
  */
 ResourceManager.prototype.canSatisfyCreeps = function(planSet) {
@@ -74,7 +74,7 @@ ResourceManager.prototype.canSatisfyCreeps = function(planSet) {
 /**
  * Returns true iff this ResourceManager can provide all the sources requested
  * by the planSet.
- * @param  {Collection of plans} planSet
+ * @param  {Collection of Plans} planSet
  * @return {Boolean}
  */
 ResourceManager.prototype.canSatisfySources = function(planSet) {
@@ -85,7 +85,7 @@ ResourceManager.prototype.canSatisfySources = function(planSet) {
 /**
  * Returns true iff this ResourceManager can provide all the spawns requested by
  * the planSet.
- * @param  {Collection of plans} planSet
+ * @param  {Collection of Plans} planSet
  * @return {Boolean}
  */
 ResourceManager.prototype.canSatisfySpawns = function(planSet) {
@@ -114,33 +114,58 @@ var canSatisfySingleUseResource = function(singleUseResources, requests) {
 /**
  * Returns true iff this ResourceManager can provide all the energy requested by
  * the planSet.
- * @param  {Collection of plans} planSet
+ * @param  {Collection of Plans} planSet
  * @return {Boolean}
  */
 ResourceManager.prototype.canSatisfyEnergy = function(planSet) {
     return requestedEnergy(planSet) <= this.availableResources.energy;
 };
 
+/**
+ * Computes the total importance value of executing all the Plans in the planSet.
+ * @param  {Collection of Plans} planSet
+ * @return {Number}
+ */
 var computePlanSetImportance = function(planSet) {
     return _.reduce(planSet, function(valueSum, plan) {
         return valueSum + plan.importance;
     }, 0);
 };
 
+/**
+ * Returns an array of the Creeps that the planSet requires.
+ * @param  {Collection of Plans} planSet
+ * @return {Array}
+ */
 var requestedCreeps = function(planSet) {
     return _(planSet).map('resourceBundle.creeps').flatten();
 };
 
+/**
+ * Returns an array of the Sources that the planSet requires.
+ * @param  {Collection of Plans} planSet
+ * @return {Array}
+ */
 var requestedSources = function(planSet) {
     return _(planSet).map('resourceBundle.sources').flatten();
 };
 
+/**
+ * Returns an array of the Spawns that the planSet requires.
+ * @param  {Collection of Plans} planSet
+ * @return {Array}
+ */
 var requestedSpawns = function(planSet) {
     return _(planSet).map('resourceBundle.spawns').flatten();
 };
 
+/**
+ * Returns the amount of energy the planSet requires.
+ * @param  {Collection of Plans} planSet
+ * @return {Number}
+ */
 var requestedEnergy = function(planSet) {
     return _.reduce(planSet, function(energySum, plan) {
         return energySum + plan.resourceBundle.energy;
     }, 0);
-}
+};
