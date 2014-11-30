@@ -35,7 +35,7 @@ var ResourceManager = module.exports.ResourceManager = function(resourceBundle) 
  * @return {Object}
  */
 ResourceManager.prototype.arbitrate = function(plans) {
-    var candidatePlanSets = _.sortBy(utils.allSubsets(plans), computePlanSetValue);
+    var candidatePlanSets = _.sortBy(utils.allSubsets(plans), computePlanSetImportance);
     var bestAcceptedPlanSet = _.find(candidatePlanSets, this.canSatisfyPlanSet);
     var rejectedPlans = _.difference(plans, bestAcceptedPlanSet);
     return {
@@ -43,6 +43,9 @@ ResourceManager.prototype.arbitrate = function(plans) {
         rejected: rejectedPlans
     };
 };
+
+// TODO: Write a method to "accept" a planSet, which would mark its resources
+// unavailable for future arbitration rounds.
 
 /**
  * Returns whether this ResourceManager can provide all the resources requested
@@ -64,7 +67,7 @@ ResourceManager.prototype.canSatisfyPlanSet = function(planSet) {
  * @return {Boolean}
  */
 ResourceManager.prototype.canSatisfyCreeps = function(planSet) {
-    var creepRequests = _(planSet).map('resourceBundle.creeps').flatten();
+    var creepRequests = requestedCreeps(planSet);
     return canSatisfySingleUseResource(this.availableResources.creeps, creepRequests);
 };
 
@@ -75,7 +78,7 @@ ResourceManager.prototype.canSatisfyCreeps = function(planSet) {
  * @return {Boolean}
  */
 ResourceManager.prototype.canSatisfySources = function(planSet) {
-    var sourceRequests = _(planSet).map('resourceBundle.sources').flatten();
+    var sourceRequests = requestedSources(planSet);
     return canSatisfySingleUseResource(this.availableResources.sources, sourceRequests);
 };
 
@@ -86,7 +89,7 @@ ResourceManager.prototype.canSatisfySources = function(planSet) {
  * @return {Boolean}
  */
 ResourceManager.prototype.canSatisfySpawns = function(planSet) {
-    var spawnRequests = _(planSet).map('resourceBundle.spawns').flatten();
+    var spawnRequests = requestedSpawns(planSet);
     return canSatisfySingleUseResource(this.availableResources.spawns, spawnRequests);
 };
 
@@ -115,14 +118,29 @@ var canSatisfySingleUseResource = function(singleUseResources, requests) {
  * @return {Boolean}
  */
 ResourceManager.prototype.canSatisfyEnergy = function(planSet) {
-    var energyRequested = _.reduce(planSet, function(energySum, plan) {
-        return energySum + plan.resourceBundle.energy;
-    }, 0);
-    return energyRequested <= this.availableResources.energy;
+    return requestedEnergy(planSet) <= this.availableResources.energy;
 };
 
-var computePlanSetValue = function(planSet) {
+var computePlanSetImportance = function(planSet) {
     return _.reduce(planSet, function(valueSum, plan) {
-        return valueSum + plan.value;
+        return valueSum + plan.importance;
     }, 0);
 };
+
+var requestedCreeps = function(planSet) {
+    return _(planSet).map('resourceBundle.creeps').flatten();
+};
+
+var requestedSources = function(planSet) {
+    return _(planSet).map('resourceBundle.sources').flatten();
+};
+
+var requestedSpawns = function(planSet) {
+    return _(planSet).map('resourceBundle.spawns').flatten();
+};
+
+var requestedEnergy = function(planSet) {
+    return _.reduce(planSet, function(energySum, plan) {
+        return energySum + plan.resourceBundle.energy;
+    }, 0);
+}
