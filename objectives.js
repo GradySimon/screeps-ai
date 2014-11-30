@@ -3,20 +3,13 @@
 var _ = require('lodash');
 var utils = require('utils');
 var behaviors = require('behaviors');
+var resources = require('resources');
 
 var MAX_HARVESTERS_PER_SOURCE = 4;
 
 
-function ResourceSpec(creeps, sources, spawns, energy) {
-    this.creeps = creeps;
-    // TODO: only allows an Objective to take a whole source or none of it.
-    this.sources = sources;
-    this.spawns = spawns;
-    this.energy = energy;
-}
-
-function Plan(resourceSpec, policy) {
-    this.resourceSpec = resourceSpec;
+function Plan(resourceBundle, policy) {
+    this.resourceBundle = resourceBundle;
     this.policy = policy;
 }
 
@@ -50,7 +43,7 @@ GrowthObjective.prototype.generatePlan = function() {
     var creepsRequested = assignments.creepsUsed;
     var sourcesRequested = assignments.sourcesUsed;
     var spawnsRequested = getSpawnsRequested(sources, harvesters);
-    var resourceSpec = new ResourceSpec(creepsRequested, sourcesRequested, spawnsRequested);
+    var resourceSpec = new resources.ResourceBundle(creepsRequested, sourcesRequested, spawnsRequested);
     var policy = function() {
         _.forEach(creepsRequested, function(creep) {
             var assignedSource = assignments.sourceToCreeps.get(creep);

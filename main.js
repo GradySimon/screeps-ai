@@ -12,7 +12,7 @@ var objectiveList = _.flatten([
 
 var plans = _.map(objectiveList, function(objective) { return objective.generatePlan(); });
 
-var evaluatedPlans = resources.evaluate(plans);
+var evaluatedPlans = resources.arbitrate(plans);
 
 var acceptedPlans = evaluatedPlans.accepted;
 var rejectedPlans = evaluatedPlans.rejected;
