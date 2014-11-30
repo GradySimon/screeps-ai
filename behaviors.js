@@ -33,7 +33,7 @@ module.exports.workerHarvestBehaviorGen = function(source) {
             creep.moveTo(source);
             creep.harvest(source);
         } else {
-            var nearestSpawn = nearestTarget(creep, Game.MY_SPAWNS);
+            var nearestSpawn = utils.nearestTarget(creep, Game.MY_SPAWNS);
             creep.moveTo(nearestSpawn);
             creep.transferEnergy(nearestSpawn);
         }
