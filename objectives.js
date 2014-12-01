@@ -1,5 +1,18 @@
 /* global Game, require, module */
 
+/* TODO: Make it possible for Objectives to generate multiple plans 
+ * This way plans can be atomic units of work that it makes sense to do
+ * regardless of whether any other plan executes. This way the ResourceManager
+ * can do a better job of maximizing importance over the possible planSets.
+ */
+
+/*
+ * TODO: Add a method to objectives that allow them to broadcast messages that other
+ * objectives can read to help them make decisions.
+ *
+ * Crazy idea: Let objectives/planners post importance bounties on requests
+ */
+
 var _ = require('lodash');
 var utils = require('utils');
 var behaviors = require('behaviors');
