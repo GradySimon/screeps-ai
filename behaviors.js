@@ -39,8 +39,6 @@ module.exports.workerHarvestNearestBehavior = function(creep) {
  */
 module.exports.workerHarvestBehaviorGen = function(source) {
     return function(creep) {
-        console.log("Behaving: " + creep.name);
-        console.log(source);
         if (creep.energy < creep.energyCapacity) {
             creep.moveTo(source);
             creep.harvest(source);
