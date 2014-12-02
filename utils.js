@@ -90,11 +90,9 @@ module.exports.selectCreeps = function(selectionSpec) {
     .toArray()
     .flatten(true) // isShallow = true
     .filter(function (creep) {
-        console.log(_.isEqual(selectionSpec.creepSpecs[0], creep.memory.spec));
         var contains =  _.some(selectionSpec.creepSpecs, function(creepSpec) {
             return _.isEqual(creepSpec, creep.memory.spec);
         });
-        console.log(contains);
         return contains;
     }).valueOf();
 };

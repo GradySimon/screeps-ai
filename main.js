@@ -3,7 +3,6 @@ var _ = require('lodash');
 var utils = require('utils');
 var objectives = require('objectives');
 var resources = require('resources');
-console.log("------- TICK -------");
 var myRooms = utils.allMyRooms();
 // TODO: Refactor so that cross-room plans can work.
 _.forEach(myRooms, function(room) {
@@ -23,8 +22,6 @@ _.forEach(myRooms, function(room) {
         acceptedPlans = _.union(acceptedPlans, arbitrationResults.accepted);
         resourceManager.commit(arbitrationResults.accepted);
         activeObjectives = _.map(arbitrationResults.rejected, 'objective');
-        console.log("Accepted plans: " + arbitrationResults.accepted.length);
-        console.log("activeObjectives = " + activeObjectives.length);
     } while(activeObjectives > 0);
 
     _.forEach(acceptedPlans, function(acceptedPlan) { acceptedPlan.policy(); });

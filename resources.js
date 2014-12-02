@@ -14,7 +14,6 @@ var utils = require('utils');
  * @param {Number} energy
  */
 var ResourceBundle = module.exports.ResourceBundle = function(creeps, sources, spawns, energy) {
-    console.log("Creating ResourceBundle");
     this.creeps = creeps;
     // TODO: only allows a bundle to specify a whole source or none of it.
     this.sources = sources;
@@ -30,7 +29,6 @@ var ResourceBundle = module.exports.ResourceBundle = function(creeps, sources, s
 var ResourceManager = module.exports.ResourceManager = function(resourceBundle) {
     this.managedResources = resourceBundle;
     this.availableResources = _.clone(resourceBundle);
-    console.log("Available resources: " + this.availableResources);
 };
 
 /**
@@ -43,11 +41,8 @@ ResourceManager.prototype.arbitrate = function(planSet) {
     var candidatePlanSets = _.sortBy(utils.allSubsets(planSet), function(planSet) {
         return -computePlanSetImportance(planSet);
     });
-    console.log("candidatePlansSets = " + candidatePlanSets.length);
     var bestSatisfiablePlanSet = _.find(candidatePlanSets, this.canSatisfyPlanSet, this);
-    console.log("bestSatisfiablePlanSet = " + bestSatisfiablePlanSet);
     var rejectedPlans = _.difference(planSet, bestSatisfiablePlanSet);
-    console.log("rejectedPlans = " + rejectedPlans.length);
     return {
         accepted: bestSatisfiablePlanSet,
         rejected: rejectedPlans
@@ -79,13 +74,7 @@ ResourceManager.prototype.commit = function(planSet) {
  * @return {Boolean}
  */
 ResourceManager.prototype.canSatisfyPlanSet = function(planSet) {
-    console.log("--- Considering a planSet ---");
     var canSatisfyC = this.canSatisfyCreeps(planSet);
-    console.log("canSatisfyCreeps: " + canSatisfyC);
-    // console.log(this.canSatisfySources(planSet));
-    // console.log(this.canSatisfySpawns(planSet));
-    // console.log(this.canSatisfyEnergy(planSet));   
-    return canSatisfyC &&
            this.canSatisfySources(planSet) &&
            this.canSatisfySpawns(planSet) &&
            this.canSatisfyEnergy(planSet);
@@ -99,8 +88,6 @@ ResourceManager.prototype.canSatisfyPlanSet = function(planSet) {
  */
 ResourceManager.prototype.canSatisfyCreeps = function(planSet) {
     var creepRequests = requestedCreeps(planSet);
-    console.log("Creeps requested = ", creepRequests.length);
-    console.log("Creeps available = " + this.availableResources.creeps.length);
     return canSatisfySingleUseResource(this.availableResources.creeps, creepRequests);
 };
 
