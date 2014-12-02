@@ -1,7 +1,9 @@
-/* global require, module */
+/* global Game, require, module */
 
 var _ = require('lodash');
 var utils = require('utils');
+
+// TODO: deal with the fact that energy only exists in a particular spawn
 
 /**
  * Represents a bundle of scarce resources, to be managed or requested.
@@ -11,11 +13,12 @@ var utils = require('utils');
  * @param {Collection of spawns} spawns
  * @param {Number} energy
  */
-module.exports.ResourceBundle = function(creeps, sources, spawns, energy) {
-    this.creeps = new Set(creeps);
+var ResourceBundle = module.exports.ResourceBundle = function(creeps, sources, spawns, energy) {
+    console.log("Creating ResourceBundle");
+    this.creeps = creeps;
     // TODO: only allows a bundle to specify a whole source or none of it.
-    this.sources = new Set(sources);
-    this.spawns = new Set(spawns);
+    this.sources = sources;
+    this.spawns = spawns;
     this.energy = energy;
 };
 
@@ -27,6 +30,7 @@ module.exports.ResourceBundle = function(creeps, sources, spawns, energy) {
 var ResourceManager = module.exports.ResourceManager = function(resourceBundle) {
     this.managedResources = resourceBundle;
     this.availableResources = _.clone(resourceBundle);
+    console.log("Available resources: " + this.availableResources);
 };
 
 /**
@@ -36,9 +40,14 @@ var ResourceManager = module.exports.ResourceManager = function(resourceBundle) 
  * @return {Object}
  */
 ResourceManager.prototype.arbitrate = function(planSet) {
-    var candidatePlanSets = _.sortBy(utils.allSubsets(planSet), computePlanSetImportance);
-    var bestSatisfiablePlanSet = _.find(candidatePlanSets, this.canSatisfyPlanSet);
+    var candidatePlanSets = _.sortBy(utils.allSubsets(planSet), function(planSet) {
+        return -computePlanSetImportance(planSet);
+    });
+    console.log("candidatePlansSets = " + candidatePlanSets.length);
+    var bestSatisfiablePlanSet = _.find(candidatePlanSets, this.canSatisfyPlanSet, this);
+    console.log("bestSatisfiablePlanSet = " + bestSatisfiablePlanSet);
     var rejectedPlans = _.difference(planSet, bestSatisfiablePlanSet);
+    console.log("rejectedPlans = " + rejectedPlans.length);
     return {
         accepted: bestSatisfiablePlanSet,
         rejected: rejectedPlans
@@ -70,7 +79,13 @@ ResourceManager.prototype.commit = function(planSet) {
  * @return {Boolean}
  */
 ResourceManager.prototype.canSatisfyPlanSet = function(planSet) {
-    return this.canSatisfyCreeps(planSet) &&
+    console.log("--- Considering a planSet ---");
+    var canSatisfyC = this.canSatisfyCreeps(planSet);
+    console.log("canSatisfyCreeps: " + canSatisfyC);
+    // console.log(this.canSatisfySources(planSet));
+    // console.log(this.canSatisfySpawns(planSet));
+    // console.log(this.canSatisfyEnergy(planSet));   
+    return canSatisfyC &&
            this.canSatisfySources(planSet) &&
            this.canSatisfySpawns(planSet) &&
            this.canSatisfyEnergy(planSet);
@@ -84,6 +99,8 @@ ResourceManager.prototype.canSatisfyPlanSet = function(planSet) {
  */
 ResourceManager.prototype.canSatisfyCreeps = function(planSet) {
     var creepRequests = requestedCreeps(planSet);
+    console.log("Creeps requested = ", creepRequests.length);
+    console.log("Creeps available = " + this.availableResources.creeps.length);
     return canSatisfySingleUseResource(this.availableResources.creeps, creepRequests);
 };
 
@@ -116,7 +133,7 @@ ResourceManager.prototype.canSatisfySpawns = function(planSet) {
  * @return {Boolean}
  */
 var canSatisfySingleUseResource = function(singleUseResources, requests) {
-    var availableResources = _.clone(singleUseResources);
+    var availableResources = new Set(singleUseResources);
     for (var request of requests) {
         if (availableResources.has(request)) {
             availableResources.delete(request);
@@ -143,8 +160,8 @@ ResourceManager.prototype.canSatisfyEnergy = function(planSet) {
  * @return {Number}
  */
 var computePlanSetImportance = function(planSet) {
-    return _.reduce(planSet, function(valueSum, plan) {
-        return valueSum + plan.importance;
+    return _.reduce(planSet, function(importanceSum, plan) {
+        return importanceSum + plan.importance;
     }, 0);
 };
 
@@ -154,7 +171,10 @@ var computePlanSetImportance = function(planSet) {
  * @return {Array}
  */
 var requestedCreeps = function(planSet) {
-    return _(planSet).map('resourceBundle.creeps').flatten();
+    var creeps = _(planSet).map(function(plan) {
+        return plan.resourceBundle.creeps;
+    }).flatten().valueOf();
+    return creeps;
 };
 
 /**
@@ -163,7 +183,10 @@ var requestedCreeps = function(planSet) {
  * @return {Array}
  */
 var requestedSources = function(planSet) {
-    return _(planSet).map('resourceBundle.sources').flatten();
+    var sources = _(planSet).map(function(plan) {
+        return plan.resourceBundle.sources;
+    }).flatten().valueOf();
+    return sources;
 };
 
 /**
@@ -172,7 +195,9 @@ var requestedSources = function(planSet) {
  * @return {Array}
  */
 var requestedSpawns = function(planSet) {
-    return _(planSet).map('resourceBundle.spawns').flatten();
+    return _(planSet).map(function (plan) {
+        return plan.resourceBundle.spawns;
+    }).flatten().valueOf();
 };
 
 /**
@@ -184,4 +209,14 @@ var requestedEnergy = function(planSet) {
     return _.reduce(planSet, function(energySum, plan) {
         return energySum + plan.resourceBundle.energy;
     }, 0);
+};
+
+module.exports.resourcesInRoom = function(room) {
+    var creeps = room.find(Game.MY_CREEPS);
+    var sources = room.find(Game.SOURCES);
+    var spawns = room.find(Game.MY_SPAWNS);
+    var energy = _.reduce(spawns, function(energySum, spawn) {
+        return energySum + spawn.energy;
+    }, 0);
+    return new ResourceBundle(creeps, sources, spawns, energy);
 };

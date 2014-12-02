@@ -17,6 +17,7 @@ var keyArray = module.exports.keyArray = function(map) {
  * @return {Array} An Array of Arrays
  */
 module.exports.allSubsets = function(array){
+    var subsets = [];
     var result, mask, total = Math.pow(2, array.length);
     for(mask = 0; mask < total; mask++){ //O(2^n)
         result = [];
@@ -26,8 +27,9 @@ module.exports.allSubsets = function(array){
                 result.push(array[i]);
             }
         }while(i--);
-        console.log(result);
+        subsets.push(result);
     }
+    return subsets;
 };
 
 var allMyRooms = module.exports.allMyRooms = function() {
@@ -69,25 +71,32 @@ module.exports.computeCreepCost = function(creepSpec) {
     }, 0);
 };
 
+/**
+ * Specifies a selection of creeps. `rooms` specifies the rooms in which to
+ * select creeps. Additionally the creeps specification must be found in
+ * `creepSpecs`.
+ * @param {Array of Creeps} rooms
+ * @param {Array of Arrays} creepSpecs
+ */
 module.exports.SelectionSpec = function(rooms, creepSpecs) {
     this.rooms = rooms;
     this.creepSpecs = creepSpecs;
 };
 
 module.exports.selectCreeps = function(selectionSpec) {
-    return _.filter(Game.creeps, function (creep) {
-        if (selectionSpec.rooms) {
-            if (!_.contains(selectionSpec.rooms, creep.room)) {
-                return false;
-            }
-        }
-        if (selectionSpec.creepSpec) {
-            if (!_.contains(selectionSpec.creepSpecs, creep.spec)) {
-                return false; 
-            }
-        }
-        return true;
-    });
+    return _(selectionSpec.rooms).map(function(room) {
+        return room.find(Game.MY_CREEPS);
+    })
+    .toArray()
+    .flatten(true) // isShallow = true
+    .filter(function (creep) {
+        console.log(_.isEqual(selectionSpec.creepSpecs[0], creep.memory.spec));
+        var contains =  _.some(selectionSpec.creepSpecs, function(creepSpec) {
+            return _.isEqual(creepSpec, creep.memory.spec);
+        });
+        console.log(contains);
+        return contains;
+    }).valueOf();
 };
 
 /**

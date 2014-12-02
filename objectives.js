@@ -22,6 +22,7 @@ var MAX_HARVESTERS_PER_SOURCE = 4;
 
 
 function Plan(objective, importance, resourceBundle, policy) {
+    console.log("Creating a Plan");
     this.objective = objective;
     this.importance = importance;
     this.resourceBundle = resourceBundle;
@@ -53,12 +54,13 @@ var GrowthObjective = module.exports.GrowthObjective = function(room) {
  */
 GrowthObjective.prototype.generatePlan = function(importance) {
     var harvesters = utils.selectCreeps(this.harvesterSelector);
+    console.log("generatePlan: harvesters = " + harvesters.length);
     var sources = this.room.find(Game.SOURCES);
     var assignments = this.getAssignments(harvesters, sources);
     var creepsRequested = assignments.creepsUsed;
     var sourcesRequested = assignments.sourcesUsed;
-    var spawnsRequested = getSpawnsRequested(sources, harvesters);
-    var resourceSpec = new resources.ResourceBundle(creepsRequested, sourcesRequested, spawnsRequested);
+    var spawnsRequested = this.getSpawnsRequested(sources, harvesters);
+    var resourcesRequired = new resources.ResourceBundle(creepsRequested, sourcesRequested, spawnsRequested, 0);
     var policy = function() {
         _.forEach(creepsRequested, function(creep) {
             var assignedSource = assignments.sourceToCreeps.get(creep);
@@ -68,7 +70,7 @@ GrowthObjective.prototype.generatePlan = function(importance) {
             behaviors.spawnCreateCreepBehaviorGen(utils.creepSpecs.Harvester)(spawn);
         });
     };
-    return new Plan(this, importance, resourceSpec, policy);
+    return new Plan(this, importance, resourcesRequired, policy);
 };
 
 /**
@@ -110,14 +112,14 @@ GrowthObjective.prototype.getAssignments = function(harvesters, sources) {
  * @param  {Collection of creeps} accessibleHarvesters
  * @return {Array of spawns} An array of spawns that should create harvesters
  */
-function getSpawnsRequested(accessibleSources, accessibleHarvesters) {
+GrowthObjective.prototype.getSpawnsRequested = function(accessibleSources, accessibleHarvesters) {
     var spawnsRequested = [];
     if (harvesterDeficit(accessibleSources.length, accessibleHarvesters.length) > 0) {
         // TODO: request more spawns if harvesterDeficit > 1;
         spawnsRequested = [this.room.find(Game.MY_SPAWNS)[0]];
     }
     return spawnsRequested;
-}
+};
 
 /**
  * Calculates how many additional harvesters the room needs to harvest
