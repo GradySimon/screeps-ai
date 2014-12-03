@@ -74,7 +74,7 @@ ResourceManager.prototype.commit = function(planSet) {
  * @return {Boolean}
  */
 ResourceManager.prototype.canSatisfyPlanSet = function(planSet) {
-    var canSatisfyC = this.canSatisfyCreeps(planSet);
+    return this.canSatisfyCreeps(planSet) &&
            this.canSatisfySources(planSet) &&
            this.canSatisfySpawns(planSet) &&
            this.canSatisfyEnergy(planSet);
