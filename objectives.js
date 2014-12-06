@@ -9,8 +9,12 @@
 /*
  * TODO: Add a method to objectives that allow them to broadcast messages that other
  * objectives can read to help them make decisions.
- *
- * Crazy idea: Let objectives/planners post importance bounties on requests
+ */
+
+/*
+ * TODO: Make objectives use a recursive "planner" structure. Planners also
+ * implement generatePlan. As you move down the planning hierarchy, plans get
+ * less strategic and more tactical.
  */
 
 var _ = require('lodash');
@@ -88,6 +92,8 @@ GrowthObjective.prototype.getAssignments = function(harvesters, sources) {
         var sortedSources = utils.sortByDistanceFrom(harvester, sources);
         _.forEach(sortedSources, function(source) {
             var roster = sourceToCreepsMap.get(source);
+            // TODO: use smarter maxHarvesters logic that takes into account
+            // the terrain at the source.
             if (roster.length < MAX_HARVESTERS_PER_SOURCE) {
                 roster.push(harvester);
                 sourceToCreepsMap.set(source, roster);
