@@ -16,9 +16,9 @@ _.forEach(myRooms, function(room) {
     var acceptedPlans = [];
 
     do {
-        var candidatePlans = _.map(activeObjectives, function(objective) {
+        var candidatePlans = _(activeObjectives).map(function(objective) {
             return objective.generatePlan(100); // TODO: real importance value
-        });
+        }).flatten(true).valueOf(); // isShallow = true
         var arbitrationResults = resourceManager.arbitrate(candidatePlans);
         acceptedPlans = _.union(acceptedPlans, arbitrationResults.accepted);
         resourceManager.commit(arbitrationResults.accepted);

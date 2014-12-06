@@ -51,9 +51,9 @@ var GrowthObjective = module.exports.GrowthObjective = function(room) {
 };
 
 /**
- * Generates a plan that will assign creeps to harvest from all available
- * sources and will create new creeps if necessary to harvest best.
- * @return {Plan}
+ * Generates am Array of Plans that will assign creeps to harvest from all available
+ * sources and will create new creeps if necessary to harvest better.
+ * @return {Array of Plans}
  */
 GrowthObjective.prototype.generatePlan = function(importance) {
     var harvesters = utils.selectCreeps(this.harvesterSelector);
@@ -72,7 +72,7 @@ GrowthObjective.prototype.generatePlan = function(importance) {
             behaviors.spawnCreateCreepBehaviorGen(utils.creepSpecs.Harvester)(spawn);
         });
     };
-    return new Plan(this, importance, resourcesRequired, policy);
+    return [new Plan(this, importance, resourcesRequired, policy)];
 };
 
 /**
