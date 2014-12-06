@@ -3,6 +3,7 @@ var _ = require('lodash');
 var utils = require('utils');
 var objectives = require('objectives');
 var resources = require('resources');
+
 var myRooms = utils.allMyRooms();
 // TODO: Refactor so that cross-room plans can work.
 _.forEach(myRooms, function(room) {
