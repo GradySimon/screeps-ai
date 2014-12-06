@@ -21,11 +21,11 @@ var utils = require('utils');
  */
 module.exports.workerHarvestNearestBehavior = function(creep) {
     if (creep.energy < creep.energyCapacity) {
-        var nearestSource = utils.nearestTarget(creep, Game.SOURCES);
+        var nearestSource = utils.nearestTarget(creep.pos, Game.SOURCES);
         moveTo(creep, nearestSource);
         creep.harvest(nearestSource);
     } else {
-        var nearestSpawn = utils.nearestTarget(creep, Game.MY_SPAWNS);
+        var nearestSpawn = utils.nearestTarget(creep.pos, Game.MY_SPAWNS);
         moveTo(creep, nearestSpawn);
         creep.transferEnergy(nearestSpawn);
     }
@@ -43,7 +43,7 @@ module.exports.workerHarvestBehaviorGen = function(source) {
             moveTo(creep, source.pos);
             creep.harvest(source);
         } else {
-            var nearestSpawn = utils.nearestTarget(creep, Game.MY_SPAWNS);
+            var nearestSpawn = utils.nearestTarget(creep.pos, Game.MY_SPAWNS);
             if (nearestSpawn) {
                 moveTo(creep, nearestSpawn.pos);
                 creep.transferEnergy(nearestSpawn);
