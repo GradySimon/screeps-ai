@@ -22,11 +22,11 @@ var utils = require('utils');
 module.exports.workerHarvestNearestBehavior = function(creep) {
     if (creep.energy < creep.energyCapacity) {
         var nearestSource = utils.nearestTarget(creep, Game.SOURCES);
-        creep.moveTo(nearestSource);
+        moveTo(creep, nearestSource);
         creep.harvest(nearestSource);
     } else {
         var nearestSpawn = utils.nearestTarget(creep, Game.MY_SPAWNS);
-        creep.moveTo(nearestSpawn);
+        moveTo(creep, nearestSpawn);
         creep.transferEnergy(nearestSpawn);
     }
 };
@@ -40,18 +40,21 @@ module.exports.workerHarvestNearestBehavior = function(creep) {
 module.exports.workerHarvestBehaviorGen = function(source) {
     return function(creep) {
         if (creep.energy < creep.energyCapacity) {
-            creep.moveTo(source);
+            moveTo(creep, source.pos);
             creep.harvest(source);
         } else {
             var nearestSpawn = utils.nearestTarget(creep, Game.MY_SPAWNS);
-            creep.moveTo(nearestSpawn);
-            creep.transferEnergy(nearestSpawn);
+            if (nearestSpawn) {
+                moveTo(creep, nearestSpawn.pos);
+                creep.transferEnergy(nearestSpawn);
+            }
         }
     };
 };
 
 /**
- * Returns a behavior that orders the given spawn to create a creep according to the given creepSpec.
+ * Returns a behavior that orders the given spawn to create a creep according to
+ * the given creepSpec.
  * @param  {Array of body parts} creepSpec
  * @return {Function} The behavior
  */
@@ -62,4 +65,24 @@ module.exports.spawnCreateCreepBehaviorGen = function(creepSpec) {
             spawn.createCreep(creepSpec, undefined, {spec: creepSpec});
         }
     };
+};
+
+var moveTo = function(creep, pos) {
+    var path = utils.findPath(creep.pos, pos);
+    var pathWithoutCreeps = utils.findPath(creep.pos, pos, {ignoreCreeps: true});
+    if (!path) {
+        // blocked
+        if (pathWithoutCreeps) {
+            // Blocked by creep, should try to avoid traffic jam. Currently, creep
+            // will just stop moving if it can't find a path, which might mean
+            // it's blocking other creeps.
+        } else {
+            // Blocked by something besides a creep
+        }
+        // TODO: handle these cases intelligently. This will just not move the
+        // creep if it's blocked
+        return;
+    }
+    creep.move(path[0].direction);
+    creep.memory.lastMove = path[0];
 };
