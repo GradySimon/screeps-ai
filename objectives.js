@@ -89,7 +89,7 @@ GrowthObjective.prototype.getAssignments = function(harvesters, sources) {
     }));
     var creepToSourceMap = new Map();
     _.forEach(harvesters, function(harvester) {
-        var sortedSources = utils.sortByDistanceFrom(harvester, sources);
+        var sortedSources = utils.sortByDistanceFrom(harvester.pos, sources);
         _.forEach(sortedSources, function(source) {
             var roster = sourceToCreepsMap.get(source);
             // TODO: use smarter maxHarvesters logic that takes into account

@@ -88,7 +88,7 @@ module.exports.SelectionSpec = function(rooms, creepSpecs) {
  * Returns all the creeps that meet the criteria specified by the selectionSpec.
  * This function will return creeps only if they are in one of the specified
  * rooms and only if they have one of the specified body part specs.
- * @param  {selectionSpec} selectionSpec 
+ * @param  {selectionSpec} selectionSpec
  * @return {Array of Creeps}    The found creeps
  */
 module.exports.selectCreeps = function(selectionSpec) {
@@ -135,17 +135,18 @@ var pathDistance = module.exports.pathDistance = function(from, to, opts) {
 };
 
 /**
- * Returns the nearest target of type targetType to the specified creep. Returns
+ * Returns the nearest target of type targetType to the specified position. Returns
  * undefined if no path to any target can be found.
- * @param  {[type]} creep
- * @param  {[type]} targetType
- * @return {[type]}
+ * @param  {RoomPosition} position
+ * @param  {[type]} targetType One of the target type constants specified in Game
+ * @return {target}
  */
-module.exports.nearestTarget = function(creep, targetType) {
-    var targets = creep.room.find(targetType);
+module.exports.nearestTarget = function(position, targetType) {
+    var room = Game.getRoom(position.roomName);
+    var targets = room.find(targetType);
     if (targets.length) {
         var closestTarget = _.min(targets, function(target) {
-            return pathDistance(creep.pos, target.pos);
+            return pathDistance(position, target.pos);
         });
         // If _.min gets only a list of undefined, it returns infinity
         if (closestTarget !== Infinity) {
@@ -157,15 +158,15 @@ module.exports.nearestTarget = function(creep, targetType) {
 };
 
 /**
- * Sorts the given array of toTargets (Spawns, Sources, structures, etc) by their
- * pathDistance from the fromTarget.
- * @param  {target} fromTarget
- * @param  {Array of targets} toTargets 
+ * Sorts the given array of targets (Spawns, Sources, structures, etc) by their
+ * pathDistance from the position.
+ * @param  {target} position
+ * @param  {Array of targets} targets
  * @return {Array of targets}
  */
-module.exports.sortByDistanceFrom = function(fromTarget, toTargets) {
-    return _.sortBy(toTargets, function(toTarget) {
-        return pathDistance(fromTarget.pos, toTarget.pos);
+module.exports.sortByDistanceFrom = function(position, targets) {
+    return _.sortBy(targets, function(toTarget) {
+        return pathDistance(position, toTarget.pos);
     });
 };
 
@@ -175,7 +176,7 @@ module.exports.sortByDistanceFrom = function(fromTarget, toTargets) {
  * @param  {RoomPosition} to
  * @param {Object} opts The option object that will be passed to
  * RoomPosition.findPathTo
- * @return {Array}      
+ * @return {Array}
  */
 var findPath = module.exports.findPath = function(from, to, opts) {
     var screepsPath = from.findPathTo(to, opts);
