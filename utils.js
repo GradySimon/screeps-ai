@@ -134,6 +134,7 @@ var pathDistance = module.exports.pathDistance = function(from, to, opts) {
     return undefined;
 };
 
+// NOTE: could _.memoize this
 /**
  * Returns the nearest target of type targetType to the specified position. Returns
  * undefined if no path to any target can be found.
@@ -141,7 +142,7 @@ var pathDistance = module.exports.pathDistance = function(from, to, opts) {
  * @param  {[type]} targetType One of the target type constants specified in Game
  * @return {target}
  */
-module.exports.nearestTarget = function(position, targetType) {
+var nearestTarget = module.exports.nearestTarget = function(position, targetType) {
     var room = Game.getRoom(position.roomName);
     var targets = room.find(targetType);
     if (targets.length) {
@@ -212,4 +213,68 @@ var isCompletePath = function(from, to, path) {
  */
 var pathToString = module.exports.pathToString = function(path) {
     return _(path).map(JSON.stringify).join(", ").valueOf();
+};
+
+var directions = module.exports.directions = [
+    Game.TOP,
+    Game.TOP_RIGHT,
+    Game.RIGHT,
+    Game.BOTTOM_RIGHT,
+    Game.BOTTOM,
+    Game.BOTTOM_LEFT,
+    Game.LEFT,
+    Game.TOP_LEFT
+];
+
+var directionDeltas = module.exports.directionDeltas = new Map([
+        [Game.TOP, [0, -1]],
+        [Game.TOP_RIGHT, [1, -1]],
+        [Game.RIGHT, [1, 0]],
+        [Game.BOTTOM_RIGHT, [1, 1]],
+        [Game.BOTTOM, [0, 1]],
+        [Game.BOTTOM_LEFT, [-1, 1]],
+        [Game.LEFT, [-1, 0]],
+        [Game.TOP_LEFT, [-1, -1]]
+    ]);
+
+/**
+ * Returns the RoomPosition in the given `direction` from `position`
+ * @param {RoomPosition} [varname] [description] {[type]}
+ */
+var positionInDirectionFrom = function(position, direction) {
+    var deltas = directionDeltas.get(direction);
+    var xDelta = deltas[0];
+    var yDelta = deltas[1];
+    var newX = position.x + xDelta;
+    var newY = position.y + yDelta;
+    if (newX < 0 || newY < 0) {
+        return undefined;
+    }
+    return position.room.getPositionAt(newX, newY);
+};
+
+/**
+ * Returns all positions adjacent to the given position
+ * @param {RoomPosition} position
+ */
+var adjacentPositions = function(position) {
+    return _(directions).map(function(direction) {
+        return positionInDirectionFrom(position, direction);
+    }).filter().valueOf();
+};
+
+// NOTE: could also paint every position in the room as accessible or not at
+// the beginning of the tick via BFS. Or store it in memory and recalculate
+// just when I create new spawns.
+// NOTE: could also _.memoize
+/**
+ * Returns positions adjacent to the `source` that have a path to at least one
+ * of my spawns.
+ * @param {Source} source
+ * @return {Array of RoomPositions}
+ */
+module.exports.accessibleHarvesterSlots = function(source) {
+    return _.filter(adjacentPositions(source), function(position) {
+        return nearestTarget(position, Game.MY_SPAWNS); 
+    });
 };
